@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hangman With Sports</title>
+    <style>
+        
+        
+        body {
+            background-image: url(/Users/alanfountain/Desktop/hangmangame/hangman/sports.jpeg);
+            color: red;
+            font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+            text-align: center;
+            font-size: 18px;
+            height: 100px;
+            
+        }
+    
+
+
+h1{
+    font-size: 50px;
+}
+h2{
+    font-size: 35px;
+}
+h3{
+    font-size: 30px;
+}
+#alphabet {
+
+  margin:15px auto;
+  padding:0;
+  max-width:900px;
+}
+
+#alphabet li {
+  float:left;
+  margin: 0 10px 10px 0;
+  list-style:none;
+  width:35px;
+  height:30px;
+  padding-top:10px;
+  background: black;
+  
+}
+.wrappper{
+   
+  width:100%;
+  margin:0 auto;
+}
+
+#my-word {
+  margin: 0;
+  display: block;
+  padding: 0;
+  display:block;
+}
+
+#my-word li {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  display: inline-block;
+  padding: 0 10px;
+  font-size:1.6em;
+}
+
+.active {
+  
+  cursor:default;
+}
+  
+
+#mylives{
+  font-size:1.6em;
+  text-align:center;
+  display:block;
+}
+
+button{
+  
+  background:red;
+  color:black;
+  border: solid 1px white;
+  text-decoration:none;
+  cursor:pointer;
+  font-size:1.2em;
+  padding:18px 10px;
+  width:180px;
+  margin: 10px;
+  outline: none;
+  
+    
+}
+
+@media (max-width: 760px) {
+  #alphabet {
+  padding:0 0 0 15px;
+}
+  }
+
+  @media (max-width: 440px) {
+  #alphabet {
+  padding:0 0 0 25px;
+}
+  }
+    </style>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+</head>
+<body>
+    <div class ="wrapper">
+        <h1>Hangman</h1>
+        <h2>Choossing Sports, Movies, and Musicals Hangman Game</h2>
+        <p>Type a letter to guess the word "sports, movies, and musicals related"</p>
+    </div>
+    <div class="wrapper">
+            <div id="buttons">
+            </div>  
+            <p id="catagoryName"></p>
+            <div id="hold">
+            </div>
+            <p id="mylives"></p>
+            <p id="clue">Clue -</p>  
+             <canvas id="stickman">This Text will show if the Browser does NOT support HTML5 Canvas tag</canvas>
+            <div class="container">
+              <button id="hint">Hint</button>
+              <button id="reset">New Game
+                    <i class="fas fa-gamepad"></i>
+              </button>
+            </div>
+        </div>
+   
+    <script>
+            window.onload = function () {
+
+var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+      'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+      't', 'u', 'v', 'w', 'x', 'y', 'z'];
+
+var categories;         // Array of topics
+var chosenCategory;     // Selected catagory
+var getHint ;          // Word getHint
+var word ;              // Selected word
+var guess ;             // Geuss
+var geusses = [ ];      // Stored geusses
+var lives ;             // Lives
+var counter ;           // Count correct geusses
+var space;              // Number of spaces in word '-'
+
+// Get elements
+var showLives = document.getElementById("mylives");
+var showCatagory = document.getElementById("scatagory");
+var getHint = document.getElementById("hint");
+var showClue = document.getElementById("clue");
+
+
+
+// create alphabet ul
+var buttons = function () {
+  myButtons = document.getElementById('buttons');
+  letters = document.createElement('ul');
+
+  for (var i = 0; i < alphabet.length; i++) {
+    letters.id = 'alphabet';
+    list = document.createElement('li');
+    list.id = 'letter';
+    list.innerHTML = alphabet[i];
+    check();
+    myButtons.appendChild(letters);
+    letters.appendChild(list);
+  }
+}
+  
+
+// Select Catagory
+var selectCat = function () {
+  if (chosenCategory === categories[0]) {
+    catagoryName.innerHTML = "The Chosen Category Is Sports";
+  } else if (chosenCategory === categories[1]) {
+    catagoryName.innerHTML = "The Chosen Category is Movies";
+  } else if (chosenCategory === categories[2]) {
+    catagoryName.innerHTML = "The Chosen Category Is Musicals";
+  }
+}
+
+// Create geusses ul
+ result = function () {
+  wordHolder = document.getElementById('hold');
+  correct = document.createElement('ul');
+
+  for (var i = 0; i < word.length; i++) {
+    correct.setAttribute('id', 'my-word');
+    guess = document.createElement('li');
+    guess.setAttribute('class', 'guess');
+    if (word[i] === "-") {
+      guess.innerHTML = "-";
+      space = 1;
+    } else {
+      guess.innerHTML = "_";
+    }
+
+    geusses.push(guess);
+    wordHolder.appendChild(correct);
+    correct.appendChild(guess);
+  }
+}
+
+// Show lives
+ comments = function () {
+  showLives.innerHTML = "You have " + lives + " lives Remaining";
+  if (lives < 1) {
+    showLives.innerHTML = "You Lose";
+  }
+  for (var i = 0; i < geusses.length; i++) {
+    if (counter + space === geusses.length) {
+        showLives.innerHTML = "You are a Winner!";
+    }
+  }
+}
+
+
+
+
+// OnClick Function
+ check = function () {
+  list.onclick= function () {
+    var geuss = (this.innerHTML);
+    this.setAttribute("class", "active");
+    this.onclick= null;
+    for (var i = 0; i < word.length; i++) {
+      if (word[i] === geuss) {
+        geusses[i].innerHTML = geuss;
+        counter += 1;
+      } 
+    }
+    var j = (word.indexOf(geuss));
+    if (j === -1) {
+      lives -= 1;
+      comments();
+    } else {
+      comments();
+    }
+  }
+}
+
+  
+// Play
+play = function () {
+  categories = [
+      ["basketball", "tennis", "golf", "hockey", "baseball", "football", "soccer"],
+      ["inception", "the-italian-job", "mission-impossible", "remember-the-Titans", "gone-in-sixty-seconds"],
+      ["hamilton", "guys-and-dolls", "singing-in-the-rain", "west-side-story", "high-school-musical"]
+  ];
+
+  chosenCategory = categories[Math.floor(Math.random() * categories.length)];
+  word = chosenCategory[Math.floor(Math.random() * chosenCategory.length)];
+  word = word.replace(/\s/g, "-");
+  console.log(word);
+  buttons();
+
+  geusses = [ ];
+  lives = 10;
+  counter = 0;
+  space = 0;
+  result();
+  comments();
+  selectCat();
+}
+
+play();
+
+// Hint
+
+  hint.onclick = function() {
+
+    hints = [
+      ["Shoot balls in a basket", "Play with yellow balls", "Tiger Woods", "A Canadian Past time and Wayne Gretsky", "An American Past Time and Derek Jeter", "Professional league is known as the NFL", "The world's most popular sport and the World Cup"],
+      ["Leo's movie about dreams", "Mark Whalberg and mini coopers", "The first movie in an action franchise starring Tom Cruise", "A football movie about a high school that stars Denzel", "A movie about stealing cars with Nicolas Cage"],
+      ["Hip Hop and the Founding Fathers", "About gambling and Frank Sinatra", "What a Glorius feeling", "Romeo and Juliet", "Get cha Head in the Game"]
+  ];
+
+  var catagoryIndex = categories.indexOf(chosenCategory);
+  var hintIndex = chosenCategory.indexOf(word);
+  showClue.innerHTML = "Clue: - " +  hints [catagoryIndex][hintIndex];
+};
+
+ // Reset
+
+document.getElementById('reset').onclick = function() {
+  correct.parentNode.removeChild(correct);
+  letters.parentNode.removeChild(letters);
+  showClue.innerHTML = "";
+  context.clearRect(0, 0, 400, 400);
+  play();
+}
+}
+</script>
+</body>
+</html>
